@@ -73,11 +73,12 @@ class FilApp {
         
         // Update last saved time
         document.getElementById('lastSaved').textContent = `Last saved: ${new Date().toLocaleTimeString()}`;
-        
-        // Auto-export to PDF if enabled
-        if (this.settings.autoExportPDF && this.currentNote) {
-            this.exportToPDF(true); // Silent export
-        }
+
+       // Auto-export to PDF if enabled
+       if (this.settings.autoExportPDF && this.currentNote) {
+           this.exportToPDF(true); // Silent export
+       }
+
     }
     
     // Event Listeners Setup
