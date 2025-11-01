@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilApp - Advanced Note Taking</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6200ea">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/monokai.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-book"></i> FilApp</h1>
+                <button class="btn-icon" id="toggleSidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="searchNotes" placeholder="Search notes..." class="search-input">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+            
+            <!-- Notebook Tree -->
+            <div class="notebook-tree" id="notebookTree">
+                <div class="tree-header">
+                    <span>Notebooks</span>
+                    <button class="btn-icon" id="addNotebook" title="New Notebook">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="treeContent" class="tree-content">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+            
+            <!-- Bottom Actions -->
+            <div class="sidebar-footer">
+                <button class="btn-icon" id="graphViewBtn" title="Graph View">
+                    <i class="fas fa-project-diagram"></i>
+                </button>
+                <button class="btn-icon" id="calendarBtn" title="Calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>
+                <button class="btn-icon" id="claudeBtn" title="Ask Claude">
+                    <i class="fas fa-robot"></i>
+                </button>
+                <button class="btn-icon" id="settingsBtn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Toolbar -->
+            <div class="toolbar" id="toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-command="bold" title="Bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button class="toolbar-btn" data-command="italic" title="Italic">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button class="toolbar-btn" data-command="underline" title="Underline">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                    <button class="toolbar-btn" data-command="strikethrough" title="Strikethrough">
+                        <i class="fas fa-strikethrough"></i>
+                    </button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <select id="fontFamily" class="toolbar-select">
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    <select id="fontSize" class="toolbar-select">
+                        <option value="1">Small</option>
+                        <option value="3" selected>Normal</option>
+                        <option value="5">Large</option>
+                        <option value="7">Huge</option>
+                    </select>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                    <button class="toolbar-btn" data-command="outdent" title="Decrease Indent">
+                        <i class="fas fa-outdent"></i>
+                    </button>
+                    <button class="toolbar-btn" data-command="indent" title="Increase Indent">
+                        <i class="fas fa-indent"></i>
+                    </button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="insertLink" title="Insert Link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                    <button class="toolbar-btn" id="insertImage" title="Insert Image">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="toolbar-btn" id="insertPDF" title="Insert PDF">
+                        <i class="fas fa-file-pdf"></i>
+                    </button>
+                    <button class="toolbar-btn" id="insertCode" title="Insert Code Block">
+                        <i class="fas fa-code"></i>
+                    </button>
+                    <button class="toolbar-btn" id="insertTable" title="Insert Table">
+                        <i class="fas fa-table"></i>
+                    </button>
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="drawBtn" title="Draw">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <button class="toolbar-btn" id="highlightBtn" title="Highlight">
+                        <i class="fas fa-highlighter"></i>
+                    </button>
+                    <input type="color" id="colorPicker" class="color-picker" title="Text Color">
+                </div>
+                
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" id="exportPDF" title="Export to PDF">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                    <button class="toolbar-btn" id="syncBtn" title="Sync to Cloud">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Note Title -->
+            <div class="note-header">
+                <input type="text" id="noteTitle" class="note-title" placeholder="Untitled Note">
+                <div class="note-meta">
+                    <span id="lastSaved">Last saved: Never</span>
+                    <span id="wordCount">Words: 0</span>
+                </div>
+            </div>
+            
+            <!-- Editor Container -->
+            <div class="editor-container">
+                <div id="editor" class="editor" contenteditable="true">
+                    <p>Start typing your note here...</p>
+                </div>
+                
+                <!-- Drawing Canvas (Hidden by default) -->
+                <canvas id="drawingCanvas" class="drawing-canvas" style="display: none;"></canvas>
+            </div>
+        </main>
+        
+        <!-- Graph View Modal -->
+        <div id="graphModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>Graph View</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="graphContainer" class="graph-container">
+                        <canvas id="graphCanvas"></canvas>
+                    </div>
+                    <div class="graph-controls">
+                        <button id="resetGraph">Reset View</button>
+                        <button id="togglePhysics">Toggle Physics</button>
+                        <label>
+                            <input type="checkbox" id="showLabels" checked> Show Labels
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendar Modal -->
+        <div id="calendarModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>Calendar</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="calendar-controls">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <span id="currentMonth"></span>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                        <button id="syncCalendar">Sync with Outlook</button>
+                    </div>
+                    <div id="calendarGrid" class="calendar-grid"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Claude Assistant Modal -->
+        <div id="claudeModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Claude Assistant</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="claudeChat" class="chat-container"></div>
+                    <div class="chat-input-container">
+                        <textarea id="claudeInput" placeholder="Ask Claude anything..." rows="3"></textarea>
+                        <button id="sendToClaude">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Editor Modal -->
+        <div id="codeModal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2>Code Editor</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="code-controls">
+                        <select id="languageSelect">
+                            <option value="javascript">JavaScript</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="java">Java</option>
+                            <option value="python">Python</option>
+                        </select>
+                        <button id="runCode">Run Code</button>
+                        <button id="insertCodeBlock">Insert to Note</button>
+                    </div>
+                    <div class="code-editor-container">
+                        <textarea id="codeEditor"></textarea>
+                    </div>
+                    <div id="codeOutput" class="code-output"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h3>Cloud Sync</h3>
+                        <label>
+                            <input type="checkbox" id="autoSync"> Auto-sync to iCloud
+                        </label>
+                        <input type="text" id="syncPath" placeholder="iCloud folder path">
+                    </div>
+                    <div class="settings-section">
+                        <h3>Theme</h3>
+                        <select id="themeSelect">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Export Settings</h3>
+                        <label>
+                            <input type="checkbox" id="autoExportPDF" checked> Auto-export notes as PDF
+                        </label>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Claude API</h3>
+                        <input type="password" id="claudeApiKey" placeholder="Enter your Claude API key">
+                        <small>Get your API key from Anthropic Console</small>
+                    </div>
+                    <button id="saveSettings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden file inputs -->
+    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+    <input type="file" id="pdfInput" accept="application/pdf" style="display: none;">
+    
+    <!-- External Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/clike/clike.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
